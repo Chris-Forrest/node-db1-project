@@ -39,4 +39,20 @@ router.post("/", async (req,res) => {
     }
 });
 
+router.put("/:id", async (req,res) => {
+    try{
+        await db("accounts").update({
+            name: req.body.name,
+            budget: req.body.budget,
+        })
+        .where("id", req.params.id)
+        const account = await db("accounts")
+        .where("id", req.params.id)
+        .first()
+        res.json(account)
+    }catch(err){
+        res.status(500).json({ message: " Could not edit account."})
+    }
+});
+
 module.exports = router;
