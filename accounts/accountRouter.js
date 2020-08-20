@@ -12,7 +12,7 @@ router.get("/", async (req,res) => {
     }catch(err){
         res.status(500).json({ message: "Could not retrieve accounts."})
     }
-})
+});
 
 router.get("/:id", async (req,res) => {
     try{
@@ -21,6 +21,22 @@ router.get("/:id", async (req,res) => {
     }catch(err){
         res.status(500).json({ message:"Could not retrieve account."})
     }
-})
+});
+
+router.post("/", async (req,res) => {
+    try{
+        const [id] = await db.insert({
+            name: req.body.name,
+            budget: req.body.budget,
+        })
+        .into("accounts")
+        const account = await db("accounts")
+        .where("id",id)
+        .first()
+        res.status(201).json(account)
+    }catch(err){
+        res.status(500).json({ message: "Could not add account"})
+    }
+});
 
 module.exports = router;
