@@ -5,25 +5,30 @@ const db = require("../data/dbConfig");
 
 //const router = express.Router()
 
-router.get("/", async (req,res) => {
+router.get("/", async (req,res, next ) => {
     try{
-        const accounts = await db.select("*").from("accounts")
+       // const accounts = await db.select("*").from("accounts")
+       const accounts = await db("accounts")
+                                .limit(req.query.limit || 20)
+                                .orderBy(req.query.sortby || "id")
         res.status(200).json(accounts)
     }catch(err){
-        res.status(500).json({ message: "Could not retrieve accounts."})
+        //res.status(500).json({ message: "Could not retrieve accounts."})
+        next(err)
     }
 });
 
-router.get("/:id", async (req,res) => {
+router.get("/:id", async (req,res, next) => {
     try{
         const [account] = await db.select("*").from("accounts").where("id",req.params.id).limit(1)
         res.json(account)
     }catch(err){
-        res.status(500).json({ message:"Could not retrieve account."})
+       // res.status(500).json({ message:"Could not retrieve account."})
+       next(err)
     }
 });
 
-router.post("/", async (req,res) => {
+router.post("/", async (req,res, next) => {
     try{
         const [id] = await db.insert({
             name: req.body.name,
@@ -35,11 +40,12 @@ router.post("/", async (req,res) => {
         .first()
         res.status(201).json(account)
     }catch(err){
-        res.status(500).json({ message: "Could not add account"})
+       // res.status(500).json({ message: "Could not add account"})
+       next(err)
     }
 });
 
-router.put("/:id", async (req,res) => {
+router.put("/:id", async (req,res, next) => {
     try{
         await db("accounts").update({
             name: req.body.name,
@@ -51,7 +57,8 @@ router.put("/:id", async (req,res) => {
         .first()
         res.json(account)
     }catch(err){
-        res.status(500).json({ message: " Could not edit account."})
+       // res.status(500).json({ message: " Could not edit account."})
+       next(err)
     }
 });
 
